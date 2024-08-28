@@ -1,0 +1,63 @@
+---
+title: "API Practice"
+author: "Carmen"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(dataRetrieval)
+library(tidyverse)
+```
+
+```{r}
+# Ventura River:
+siteNumber <- "11118500"
+parameterCd <- "00060" # Discharge
+startDate <- "2023-08-19"
+endDate <- "2023-08-22"
+
+discharge <- readNWISdv(siteNumber, parameterCd, startDate, endDate)
+```
+
+```{r}
+ventura_discharge <- discharge %>%
+  rename("agency" = agency_cd, "site_no" = site_no, "date" = Date, "discharge" = X_00060_00003, "unk" = X_00060_00003_cd)
+
+ggplot(ventura_discharge, aes(x = date, y = discharge)) +
+  geom_line()+
+  labs(x = "Date",
+       y = "Discharge (ft³/s)",
+       title = "Discharge of Ventura Stream 2023",
+       caption = "Data: USGS") +
+  theme_minimal()
+  #scale_x_discrete()
+
+max_norm <- max(ventura_discharge$discharge)
+```
+
+```{r}
+# Ventura River during storm:
+siteNumber <- "11118500"
+parameterCd <- "00060" # Discharge
+startDate <- "2023-01-09"
+endDate <- "2023-01-09"
+
+discharge_storm <- readNWISdv(siteNumber, parameterCd, startDate, endDate)
+
+ventura_discharge_storm <- discharge_storm %>%
+  rename("agency" = agency_cd, "site_no" = site_no, "date" = Date, "discharge" = X_00060_00003, "unk" = X_00060_00003_cd)
+
+max_storm <- max(ventura_discharge_storm$discharge)
+
+perc_change <- ((max_storm-max_norm)/max_norm)*100 
+perc_change
+
+```
+
+```{r}
+
+```
+
